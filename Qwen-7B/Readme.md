@@ -45,11 +45,6 @@ http://localhost:8080
 **Second Option: Cloudflare Tunnel**  
 To expose your TGI service publicly using a Cloudflare Tunnel:
 
-- On macOS (with `brew`):
-  ```
-  brew install cloudflared
-  ```
-
 - On Ubuntu (using `.deb` package):
   ```
   wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
