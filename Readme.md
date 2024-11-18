@@ -57,3 +57,6 @@ Each model directory contains:
 
 🎉 That's it! You're all set to manage LLMs on Intel GPUs with `xpu_tgi`. Happy deploying!
 
+
+![TGI LLM Servers](./hi_tgi.jpg)
+
