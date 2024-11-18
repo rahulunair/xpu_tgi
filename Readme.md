@@ -1,8 +1,9 @@
 # xpu_tgi
 
 Welcome to `xpu_tgi`! 🚀  
-
+<div align="center">
 <img src="./hi_tgi.jpg" alt="TGI LLM Servers" width="400"/>
+</div>
 
 This repo helps you deploy and manage large language models (LLMs) on Intel GPUs with ease. Each model is organized and ready to go!
 
