@@ -17,10 +17,10 @@ ExecStart=/usr/bin/docker run --rm --name phi-3-mini-128k-tgi \
     ghcr.io/huggingface/text-generation-inference:2.4.0-intel-xpu \
     --model-id microsoft/Phi-3-mini-128k-instruct \
     --dtype bfloat16 \
-    --max-concurrent-requests 4 \
+    --max-concurrent-requests 1 \
     --max-batch-size 1 \
-    --max-total-tokens 2048 \
-    --max-input-length 2048 \
+    --max-total-tokens 8192 \
+    --max-input-length 4096 \
     --max-waiting-tokens 10 \
     --port 80 --json-output
 
