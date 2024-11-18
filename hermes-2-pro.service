@@ -1,5 +1,5 @@
 [Unit]
-Description=Hermes 2 Pro TGI Service
+Description=Hermes 2 Pro Llama 3 8B TGI Service
 After=docker.service
 Requires=docker.service
 
