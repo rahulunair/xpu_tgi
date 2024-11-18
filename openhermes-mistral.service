@@ -1,5 +1,5 @@
 [Unit]
-Description=OpenHermes 2.5 Mistral TGI Service
+Description=OpenHermes 2.5 Mistral 7B TGI Service
 After=docker.service
 Requires=docker.service
 
