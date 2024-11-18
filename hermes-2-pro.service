@@ -18,7 +18,7 @@ ExecStart=/usr/bin/docker run --rm --name hermes-2-pro-tgi \
     --model-id NousResearch/Hermes-2-Pro-Llama-3-8B \
     --dtype bfloat16 \
     --max-concurrent-requests 4 \
-    --max-batch-size 2 \
+    --max-batch-size 1 \
     --max-total-tokens 4096 \
     --max-input-length 2048 \
     --max-waiting-tokens 20 \
