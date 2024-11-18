@@ -51,7 +51,7 @@ Each model directory contains:
 
 ## Adding a New Model
 
-0. Go to Intel Tiber AI cloud[https://cloud.intel.com], create an account and spin up an Intel Data Center Max series GPU.
+0. Go to [Intel Tiber AI cloud](https://cloud.intel.com), create an account and spin up an Intel Data Center Max series GPU.
 1. Validate the model is compatible with Intel GPU and TGI.
 2. Create a new directory named after your model.
 3. Add a `.service` file, and copy over the `setup.sh`, `stop.sh`, and `check_status.sh` scripts.
