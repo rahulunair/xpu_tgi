@@ -1,0 +1,29 @@
+[Unit]
+Description=Hermes 3 TGI Service
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+ExecStartPre=-/usr/bin/docker rm -f hermes-3-tgi
+ExecStart=/usr/bin/docker run --rm --name hermes-3-tgi \
+    --privileged --cap-add=sys_nice \
+    --device=/dev/dri \
+    --ipc=host \
+    -p 8082:80 \
+    --shm-size 2g \
+    ghcr.io/huggingface/text-generation-inference:2.4.0-intel-xpu \
+    --model-id NousResearch/Hermes-3-Llama-3.1-8B \
+    --dtype bfloat16 \
+    --max-concurrent-requests 4 \
+    --max-batch-size 1 \
+    --max-total-tokens 4096 \
+    --max-input-length 2048 \
+    --max-waiting-tokens 20 \
+    --cuda-graphs 0 \
+    --port 80 --json-output
+
+[Install]
+WantedBy=multi-user.target
