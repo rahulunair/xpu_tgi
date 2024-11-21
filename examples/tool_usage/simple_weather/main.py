@@ -131,7 +131,7 @@ class SimpleWeatherAgent:
 def main():
     tgi_endpoint = "http://localhost:8080/generate"
     agent = SimpleWeatherAgent(tgi_endpoint)
-    print("Advanced AI Agent (type 'quit' to exit)")
+    print("Weather AI Agent (type 'quit' to exit)")
     while True:
         user_input = input("\nUser: ").strip()
         if user_input.lower() == "quit":
