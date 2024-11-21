@@ -52,7 +52,7 @@ Weather Data:
 Hey there! Looks like Delhi is quite chilly today with a temperature of 14.6°C. It's a bit cold, so make sure to bundle up and keep warm. The wind is blowing at a gentle 2.6 km/h, so it's not too windy. Stay cozy and enjoy your day!
 ```
 
-##Features
+## Features
 
 - Natural language understanding of weather queries
 - Real-time weather data fetching using Open-Meteo API
