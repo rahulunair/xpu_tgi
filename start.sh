@@ -12,6 +12,7 @@ fi
 
 # Script variables
 MODEL_DIR="$1"
+MODEL_DIR="models/$MODEL_DIR"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MAX_WAIT=600
 INTERVAL=10
