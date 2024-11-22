@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   tgi:
     image: ghcr.io/huggingface/text-generation-inference:${TGI_VERSION:-2.4.0-intel-xpu}
