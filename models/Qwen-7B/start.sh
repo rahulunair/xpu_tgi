@@ -78,11 +78,19 @@ while [ $elapsed -lt $MAX_WAIT ]; do
         docker compose -f "${SCRIPT_DIR}/docker-compose.yml" ps
         exit 0
     fi
+    
+    # Show recent logs every 30 seconds
+    if (( elapsed % 30 == 0 )); then
+        log "Recent container logs:"
+        docker compose -f "${SCRIPT_DIR}/docker-compose.yml" logs --tail=20
+    fi
+    
     sleep $INTERVAL
     elapsed=$((elapsed + INTERVAL))
     log "Still waiting for service to be healthy... ($elapsed/${MAX_WAIT}s)"
 done
 
 log "ERROR: Service failed to become healthy within ${MAX_WAIT} seconds"
+log "Full container logs:"
 docker compose -f "${SCRIPT_DIR}/docker-compose.yml" logs
 exit 1
