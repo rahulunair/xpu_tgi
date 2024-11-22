@@ -15,7 +15,7 @@ A curated collection of Text Generation Inference (TGI) models optimized for Int
 python utils/generate_token.py
 
 # 2. Start a model
-./start.sh models/Flan-T5-XXL
+./start.sh Flan-T5-XXL
 
 # 3. Make a request
 curl -X POST http://localhost:8000/generate \
@@ -28,13 +28,36 @@ curl -X POST http://localhost:8000/generate \
 
 ```mermaid
 graph LR
-    Client[Client] -->|HTTP Request + Token| Traefik[Traefik Proxy\n:8000]
-    subgraph Internal Network
-        Traefik -->|1. Validate| Auth[Auth Service\n:3000]
+    %% Nodes
+    Client([Client])
+    Traefik[Traefik Proxy\n:8000]
+    Auth[Auth Service\n:3000]
+    TGI[TGI Service\n:80]
+    
+    %% Connections
+    Client -->|HTTP Request + Token| Traefik
+    
+    subgraph Internal["Internal Network"]
+        Traefik -->|1. Validate| Auth
         Auth -->|2. Token Status| Traefik
-        Traefik -->|3. If Valid| TGI[TGI Service\n:80]
+        Traefik -->|3. If Valid| TGI
+        TGI -->|4. Response| Traefik
     end
-    Traefik -->|Response| Client
+    
+    Traefik -->|5. Response| Client
+    
+    %% Styling
+    classDef client fill:#f2d2ff,stroke:#9645b7,stroke-width:2px
+    classDef proxy fill:#bbdefb,stroke:#1976d2,stroke-width:2px
+    classDef auth fill:#c8e6c9,stroke:#388e3c,stroke-width:2px
+    classDef tgi fill:#ffccbc,stroke:#e64a19,stroke-width:2px
+    classDef network fill:#fff9c4,stroke:#fbc02d,stroke-width:1px
+    
+    class Client client
+    class Traefik proxy
+    class Auth auth
+    class TGI tgi
+    class Internal network
 ```
 
 ### Key Features
