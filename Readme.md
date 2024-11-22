@@ -14,6 +14,37 @@ This repo helps you deploy and manage large language models (LLMs) on Intel GPUs
 
 The repo is organized by models, each in its own self-contained directory:
 
+## Usage
+
+```bash
+# Start a model
+./models/start.sh <model-name>
+
+# Check status
+./models/status.sh <model-name>
+
+# Stop a model
+./models/stop.sh <model-name>
+```
+
+## Model Selection Guide
+
+1. **Need long context?**
+   - Phi-3-mini-128k (128k tokens)
+   - Hermes-3-llama3.1 (8k tokens)
+
+2. **Code generation?**
+   - CodeLlama-7b (specialized)
+   - Phi-3-mini-4k (good capability)
+
+3. **Structured tasks?**
+   - FLAN-T5-XXL (classification, QA)
+   - FLAN-UL2 (translation, summarization)
+
+4. **General purpose?**
+   - OpenHermes-Mistral (efficient)
+   - Hermes-2-pro (balanced)
+
 ## Available Models
 
 ### General Purpose
@@ -66,7 +97,7 @@ The repo is organized by models, each in its own self-contained directory:
 1. **Verify TGI Compatibility**
    - Test the model on Intel Developer Cloud
    - Create an account at [Intel Developer Cloud](https://cloud.intel.com)
-   - Use Intel Data Centre Max GPU VM
+   - Use Intel Data Center Max GPU VM
    - Verify model works with TGI
 
 2. **Create Model Directory**
@@ -110,36 +141,6 @@ The repo is organized by models, each in its own self-contained directory:
    - Document any special considerations
    - Explain model's unique capabilities
 
-## Usage
-
-```bash
-# Start a model
-./start.sh <model-name>
-
-# Check status
-./status.sh <model-name>
-
-# Stop a model
-./stop.sh <model-name>
-```
-
-## Model Selection Guide
-
-1. **Need long context?**
-   - Phi-3-mini-128k (128k tokens)
-   - Hermes-3-llama3.1 (8k tokens)
-
-2. **Code generation?**
-   - CodeLlama-7b (specialized)
-   - Phi-3-mini-4k (good capability)
-
-3. **Structured tasks?**
-   - FLAN-T5-XXL (classification, QA)
-   - FLAN-UL2 (translation, summarization)
-
-4. **General purpose?**
-   - OpenHermes-Mistral (efficient)
-   - Hermes-2-pro (balanced)
 
 ## License Notes
 
