@@ -53,7 +53,7 @@ Flan-UL2 is designed for instruction-following tasks. Here are some examples:
 
 ### 1. Translation
 ```bash
-curl -X POST http://localhost:8083/v1/generate \
+curl -X POST http://localhost:8083/generate \
   -H 'Content-Type: application/json' \
   -d '{
     "inputs": "Translate English to French: The weather is beautiful today.",
@@ -66,7 +66,7 @@ curl -X POST http://localhost:8083/v1/generate \
 
 ### 2. Text Summarization
 ```bash
-curl -X POST http://localhost:8083/v1/generate \
+curl -X POST http://localhost:8083/generate \
   -H 'Content-Type: application/json' \
   -d '{
     "inputs": "Summarize this text: The James Webb Space Telescope (JWST) is the largest optical telescope in space. It was launched in December 2021 and is designed to conduct infrared astronomy. Its capabilities allow it to see objects too early, distant, or faint for the Hubble Space Telescope.",
@@ -79,7 +79,7 @@ curl -X POST http://localhost:8083/v1/generate \
 
 ### 3. Question Answering
 ```bash
-curl -X POST http://localhost:8083/v1/generate \
+curl -X POST http://localhost:8083/generate \
   -H 'Content-Type: application/json' \
   -d '{
     "inputs": "Answer this question: What causes the seasons on Earth? Provide a detailed explanation.",
