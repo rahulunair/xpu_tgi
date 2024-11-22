@@ -5,7 +5,6 @@ set -euo pipefail
 IFS=$'\n\t'
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "${SCRIPT_DIR}/config/model.env"
 
 # Logging function
 log() {
@@ -23,41 +22,23 @@ error_handler() {
 # Set error handler
 trap 'error_handler ${LINENO} $?' ERR
 
-cleanup() {
-    local exit_code=$?
-    
-    # Stop containers using docker-compose
-    log "Stopping containers..."
-    docker compose -f "${SCRIPT_DIR}/docker-compose.yml" down --timeout 30
-    
-    # Ensure container is removed even if compose down fails
-    if docker ps -a --format '{{.Names}}' | grep -q "^${MODEL_NAME}$"; then
-        log "Forcing container removal..."
-        docker rm -f "${MODEL_NAME}" || true
-    fi
-    
-    # Remove network if it exists
-    if docker network ls --format '{{.Name}}' | grep -q "^${MODEL_NAME}_network$"; then
-        log "Removing network..."
-        docker network rm "${MODEL_NAME}_network" || true
-    fi
-    
-    # Check and kill any process using the port
-    local pid
-    pid=$(lsof -ti:${PORT} 2>/dev/null || true)
-    if [[ -n "${pid}" ]]; then
-        log "Killing process using port ${PORT}..."
-        kill -9 "${pid}" 2>/dev/null || true
-    fi
-    
-    log "Cleanup completed"
-    exit $exit_code
-}
+# Load environment variables
+ENV_FILE="${SCRIPT_DIR}/config/model.env"
+if [[ ! -f "${ENV_FILE}" ]]; then
+    log "ERROR: model.env file not found at ${ENV_FILE}"
+    exit 1
+fi
 
-# Set cleanup trap
-trap cleanup EXIT
+# Export all variables from env file
+set -a
+source "${ENV_FILE}"
+set +a
 
-log "Stopping Qwen-7B service..."
-docker compose -f "${SCRIPT_DIR}/docker-compose.yml" --env-file "${SCRIPT_DIR}/config/model.env" down
+# Source cleanup script
+log "Stopping service and cleaning up..."
+if ! source "${SCRIPT_DIR}/scripts/cleanup.sh"; then
+    log "ERROR: Cleanup failed"
+    exit 1
+fi
 
 log "Service stopped successfully" 
