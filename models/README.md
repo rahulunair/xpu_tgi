@@ -26,7 +26,7 @@ The repo is organized by models, each in its own self-contained directory:
   - Best for: Structured tasks, classification
   - Context: 512 tokens
   - Excellent for specific, focused tasks
-
+g
 ### Reasoning & Analysis
 - **Phi-3-mini-4k** (PORT 8081)
   - Best for: Reasoning, coding, structured tasks
