@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  tgi:
+    image: ghcr.io/huggingface/text-generation-inference:${TGI_VERSION}
+    container_name: ${MODEL_NAME}
+    restart: unless-stopped
+    privileged: true
+    cap_add:
+      - sys_nice
+    devices:
+      - /dev/dri:/dev/dri
+    ipc: host
+    shm_size: ${SHM_SIZE}
+    ports:
+      - "${PORT}:80"
+    networks:
+      - tgi_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    command: >
+      --model-id ${MODEL_ID}
+      --dtype bfloat16
+      --max-concurrent-requests ${MAX_CONCURRENT_REQUESTS}
+      --max-batch-size ${MAX_BATCH_SIZE}
+      --max-total-tokens ${MAX_TOTAL_TOKENS}
+      --max-input-length ${MAX_INPUT_LENGTH}
+      --max-waiting-tokens ${MAX_WAITING_TOKENS}
+      --cuda-graphs 0
+      --port 80
+      --json-output
+
+networks:
+  tgi_net:
+    name: ${MODEL_NAME}_network
+    driver: bridge
