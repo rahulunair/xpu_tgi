@@ -32,12 +32,12 @@ log() {
 }
 
 check_network_status() {
-    local network_name="tgi_${MODEL_NAME}_network"
-    
+    local network_name="${MODEL_NAME}_network"
+
     log "Checking network status..."
     if docker network ls --format '{{.Name}}' | grep -q "^${network_name}$"; then
         log "Network ${network_name} exists"
-        
+
         # Check network details
         log "Network details:"
         docker network inspect "${network_name}" -f '
@@ -78,4 +78,4 @@ docker stats --no-stream $(docker compose -f "${SCRIPT_DIR}/docker-compose.yml" 
 
 # Show recent logs
 log "Recent logs:"
-docker compose -f "${SCRIPT_DIR}/docker-compose.yml" --env-file "${ENV_FILE}" logs --tail=20 
+docker compose -f "${SCRIPT_DIR}/docker-compose.yml" --env-file "${ENV_FILE}" logs --tail=20
