@@ -17,10 +17,10 @@ services:
     environment:
       - MODEL_NAME=${MODEL_NAME:-flan-ul2-tgi}
       - MODEL_ID=${MODEL_ID:-google/flan-ul2}
-      - MAX_CONCURRENT_REQUESTS=${MAX_CONCURRENT_REQUESTS:-100}
-      - MAX_BATCH_SIZE=${MAX_BATCH_SIZE:-8}
+      - MAX_CONCURRENT_REQUESTS=${MAX_CONCURRENT_REQUESTS:-10}
+      - MAX_BATCH_SIZE=${MAX_BATCH_SIZE:-1}
       - MAX_TOTAL_TOKENS=${MAX_TOTAL_TOKENS:-4096}
-      - MAX_INPUT_LENGTH=${MAX_INPUT_LENGTH:-2048}
+      - MAX_INPUT_LENGTH=${MAX_INPUT_LENGTH:-2039}
       - MAX_WAITING_TOKENS=${MAX_WAITING_TOKENS:-20}
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:80/v1/models || exit 1"]
@@ -32,9 +32,9 @@ services:
       --model-id ${MODEL_ID:-google/flan-ul2}
       --dtype bfloat16
       --max-concurrent-requests ${MAX_CONCURRENT_REQUESTS:-10}
-      --max-batch-size ${MAX_BATCH_SIZE:-2}
+      --max-batch-size ${MAX_BATCH_SIZE:-1}
       --max-total-tokens ${MAX_TOTAL_TOKENS:-4096}
-      --max-input-length ${MAX_INPUT_LENGTH:-2030}
+      --max-input-length ${MAX_INPUT_LENGTH:-2039}
       --max-waiting-tokens ${MAX_WAITING_TOKENS:-20}
       --cuda-graphs 0
       --port 80

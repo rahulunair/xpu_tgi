@@ -5,7 +5,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "${SCRIPT_DIR}/../config/model.env"
+source "${SCRIPT_DIR}/config/model.env"
 
 # Logging function
 log() {
@@ -18,9 +18,9 @@ cleanup() {
     log "Starting cleanup process..."
 
     # 1. Stop and remove containers using docker-compose
-    if [[ -f "${SCRIPT_DIR}/../docker-compose.yml" ]]; then
+    if [[ -f "${SCRIPT_DIR}/docker-compose.yml" ]]; then
         log "Stopping containers using docker-compose..."
-        docker compose -f "${SCRIPT_DIR}/../docker-compose.yml" down --timeout 30 || true
+        docker compose -f "${SCRIPT_DIR}/docker-compose.yml" down --timeout 30 || true
     fi
 
     # 2. Force remove container if it still exists
