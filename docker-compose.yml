@@ -1,3 +1,6 @@
+env_file:
+  - .env
+
 services:
   auth-service:
     build: 
@@ -5,6 +8,8 @@ services:
     container_name: tgi_auth
     environment:
       - VALID_TOKEN=${VALID_TOKEN}
+    env_file:
+      - .env
     networks:
       - tgi_net
     read_only: true
