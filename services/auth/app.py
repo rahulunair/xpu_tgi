@@ -56,6 +56,15 @@ def update_failed_attempts(ip: str) -> None:
         logger.warning(f"IP {ip} has been banned due to too many failed attempts")
 
 
+def reset_failed_attempts(ip: str) -> None:
+    """Reset failed attempts for an IP after successful authentication"""
+    if ip in failed_attempts:
+        del failed_attempts[ip]
+    if ip in last_attempt_timestamps:
+        del last_attempt_timestamps[ip]
+    logger.info(f"Reset failed attempts for IP {ip} after successful authentication")
+
+
 @app.middleware("http")
 async def ban_middleware(request: Request, call_next):
     client_ip = request.client.host
@@ -82,6 +91,8 @@ async def validate_token(request: Request, authorization: Optional[str] = Header
             logger.warning(f"Invalid token attempt from IP: {client_ip}")
             update_failed_attempts(client_ip)
             raise HTTPException(status_code=401, detail="Invalid token")
+
+        reset_failed_attempts(client_ip)
 
         return JSONResponse(
             content={"status": "valid"},

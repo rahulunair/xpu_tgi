@@ -92,21 +92,33 @@ docker compose -f "${SCRIPT_DIR}/docker-compose.yml" \
 
 log "Waiting for service to be healthy..."
 elapsed=0
+
 while [ $elapsed -lt $MAX_WAIT ]; do
-    if docker compose -f "${SCRIPT_DIR}/docker-compose.yml" --env-file "${ENV_FILE}" ps --format json | grep -q '"Health": "healthy"'; then
-        log "Service is healthy"
-        docker compose -f "${SCRIPT_DIR}/docker-compose.yml" --env-file "${ENV_FILE}" ps
+    # Check if all services are healthy
+    UNHEALTHY_COUNT=$(docker compose -f "${SCRIPT_DIR}/docker-compose.yml" ps | grep -c "(unhealthy)" || true)
+    HEALTH_STATUS=$(docker compose -f "${SCRIPT_DIR}/docker-compose.yml" ps | grep -c "healthy" || true)
+    TOTAL_SERVICES=3  # auth, proxy, and tgi
+
+    if [ "$UNHEALTHY_COUNT" -eq 0 ] && [ "$HEALTH_STATUS" -eq "$TOTAL_SERVICES" ]; then
+        log "All services are healthy!"
+        docker compose -f "${SCRIPT_DIR}/docker-compose.yml" \
+            --env-file "${ENV_FILE}" \
+            --env-file "${ROOT_ENV_FILE}" \
+            ps
         exit 0
     fi
 
     if (( elapsed % 30 == 0 )); then
         log "Recent container logs:"
-        docker compose -f "${SCRIPT_DIR}/docker-compose.yml" --env-file "${ENV_FILE}" logs --tail=20
+        docker compose -f "${SCRIPT_DIR}/docker-compose.yml" \
+            --env-file "${ENV_FILE}" \
+            --env-file "${ROOT_ENV_FILE}" \
+            logs --tail=20
     fi
 
     sleep $INTERVAL
     elapsed=$((elapsed + INTERVAL))
-    log "Still waiting for service to be healthy... ($elapsed/${MAX_WAIT}s)"
+    log "Still waiting for services to be healthy... ($elapsed/${MAX_WAIT}s)"
 done
 
 log "ERROR: Service failed to become healthy within ${MAX_WAIT} seconds"
