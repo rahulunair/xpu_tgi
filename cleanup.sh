@@ -28,16 +28,13 @@ log() {
 
 cleanup() {
     local exit_code=$?
-
     log "Starting cleanup process..."
-
-    # Stop all containers using docker-compose
     if [[ -f "${SCRIPT_DIR}/docker-compose.yml" ]]; then
         log "Stopping containers using docker-compose..."
         docker compose -f "${SCRIPT_DIR}/docker-compose.yml" --env-file "${ENV_FILE}" down --timeout 30 || true
     fi
 
-    # Cleanup specific containers if they still exist
+
     local containers=("${MODEL_NAME}" "tgi_auth" "tgi_proxy")
     for container in "${containers[@]}"; do
         if docker ps -a --format '{{.Names}}' | grep -q "^${container}$"; then
@@ -46,14 +43,12 @@ cleanup() {
         fi
     done
 
-    # Cleanup network
     local network_name="${MODEL_NAME}_network"
     if docker network ls --format '{{.Name}}' | grep -q "^${network_name}$"; then
         log "Removing network ${network_name}..."
         docker network rm "${network_name}" || true
     fi
 
-    # Cleanup ports
     local ports=("8000" "3000" "${PORT}")
     for port in "${ports[@]}"; do
         local pid
@@ -64,17 +59,15 @@ cleanup() {
         fi
     done
 
-    # Remove any dangling volumes related to the services
+
     log "Cleaning up dangling volumes..."
     docker volume prune -f || true
-
     log "Cleanup completed"
     return $exit_code
 }
 
-# Trap for cleanup on script exit
-trap cleanup EXIT
 
+trap cleanup EXIT
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     cleanup
 fi

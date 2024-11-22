@@ -61,7 +61,6 @@ validate_network() {
     log "Validating network configuration..."
     if docker network ls --format '{{.Name}}' | grep -q "^${network_name}$"; then
         log "Network ${network_name} exists, checking for conflicts..."
-
         local connected_containers
         connected_containers=$(docker network inspect "${network_name}" -f '{{range .Containers}}{{.Name}} {{end}}')
         if [[ -n "${connected_containers}" ]]; then
@@ -94,11 +93,9 @@ log "Waiting for service to be healthy..."
 elapsed=0
 
 while [ $elapsed -lt $MAX_WAIT ]; do
-    # Check if all services are healthy
     UNHEALTHY_COUNT=$(docker compose -f "${SCRIPT_DIR}/docker-compose.yml" ps | grep -c "(unhealthy)" || true)
     HEALTH_STATUS=$(docker compose -f "${SCRIPT_DIR}/docker-compose.yml" ps | grep -c "healthy" || true)
-    TOTAL_SERVICES=3  # auth, proxy, and tgi
-
+    TOTAL_SERVICES=3  
     if [ "$UNHEALTHY_COUNT" -eq 0 ] && [ "$HEALTH_STATUS" -eq "$TOTAL_SERVICES" ]; then
         log "All services are healthy!"
         docker compose -f "${SCRIPT_DIR}/docker-compose.yml" \

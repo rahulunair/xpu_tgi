@@ -2,148 +2,137 @@
 
 Welcome to `xpu_tgi`! 🚀  
 
-A curated collection of Text Generation Inference (TGI) models optimized for Intel XPU.
+A curated collection of Text Generation Inference (TGI) models optimized for Intel XPU, with built-in security and traffic management.
 
 <div align="center">
 <img src="./hi_tgi.jpg" alt="TGI LLM Servers" width="400"/>
 </div>
 
-This repo helps you deploy and manage large language models (LLMs) on Intel GPUs using TGI with ease. Each model is organized and ready to go!
-
-## What's Inside?
-
-The repo is organized by models, each in its own self-contained directory:
-
-## Usage
+## Quick Start
 
 ```bash
-# Start a model
-./models/start.sh <model-name>
+# 1. Generate authentication token
+python utils/generate_token.py
 
-# Check status
-./models/status.sh <model-name>
+# 2. Start a model
+./start.sh models/Flan-T5-XXL
 
-# Stop a model
-./models/stop.sh <model-name>
+# 3. Make a request
+curl -X POST http://localhost:8000/generate \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"inputs": "What is quantum computing?", "parameters": {"max_new_tokens": 50}}'
 ```
 
-## Model Selection Guide
+## Architecture & Security
 
-1. **Need long context?**
-   - Phi-3-mini-128k (128k tokens)
-   - Hermes-3-llama3.1 (8k tokens)
+```mermaid
+graph LR
+    Client[Client] -->|HTTP Request + Token| Traefik[Traefik Proxy\n:8000]
+    subgraph Internal Network
+        Traefik -->|1. Validate| Auth[Auth Service\n:3000]
+        Auth -->|2. Token Status| Traefik
+        Traefik -->|3. If Valid| TGI[TGI Service\n:80]
+    end
+    Traefik -->|Response| Client
+```
 
-2. **Code generation?**
-   - CodeLlama-7b (specialized)
-   - Phi-3-mini-4k (good capability)
-
-3. **Structured tasks?**
-   - FLAN-T5-XXL (classification, QA)
-   - FLAN-UL2 (translation, summarization)
-
-4. **General purpose?**
-   - OpenHermes-Mistral (efficient)
-   - Hermes-2-pro (balanced)
+### Key Features
+- 🔒 Token-based authentication with automatic ban after failed attempts
+- 🚦 Rate limiting (global: 10 req/s, per-IP: 10 req/s)
+- 🛡️ Security headers and IP protection
+- 🔄 Health monitoring and automatic recovery
+- 🚀 Optimized for Intel GPUs
 
 ## Available Models
 
-### General Purpose
-- **FLAN-UL2** (PORT 8083)
-  - Best for: Translation, summarization, question answering
-  - Context: 2039 tokens
-  - Good balance of capabilities and performance
-
-- **FLAN-T5-XXL** (PORT 8087)
-  - Best for: Structured tasks, classification
-  - Context: 512 tokens
-  - Excellent for specific, focused tasks
-
-### Reasoning & Analysis
-- **Phi-3-mini-4k** (PORT 8081)
-  - Best for: Reasoning, coding, structured tasks
-  - Context: 4k tokens
-  - Efficient for standard tasks
-
-- **Phi-3-mini-128k** (PORT 8082)
-  - Best for: Long document analysis, complex reasoning
-  - Context: 128k tokens
-  - Ideal for tasks requiring extensive context
-
-- **Hermes-2-pro** (PORT 8084)
-  - Best for: General tasks, instruction following
-  - Context: 4k tokens
-  - Good all-round performer
-
-- **Hermes-3-llama3.1** (PORT 8085)
-  - Best for: Advanced reasoning, analysis
-  - Context: 8k tokens
-  - Strong overall capabilities
-
-- **OpenHermes-Mistral** (PORT 8086)
-  - Best for: Technical tasks, efficient reasoning
-  - Context: 8k tokens
-  - Based on Mistral architecture
+### Long Context Models (>8k tokens)
+- **Phi-3-mini-128k** - 128k context window
+- **Hermes-3-llama3.1** - 8k context window
 
 ### Code Generation
-- **CodeLlama-7b** (PORT 8089)
-  - Best for: Code generation, explanation, review
-  - Context: 4k tokens
-  - Specialized for programming tasks
+- **CodeLlama-7b** - Specialized for code completion
+- **Phi-3-mini-4k** - Efficient code generation
+
+### General Purpose
+- **Flan-T5-XXL** - Versatile text generation
+- **Flan-UL2** - Advanced language understanding
+- **Hermes-2-pro** - Balanced performance
+- **OpenHermes-Mistral** - Fast inference
+
+Each model includes:
+- Individual configuration (`config/model.env`)
+- Detailed documentation (`README.md`)
+- Optimized parameters for Intel XPU
+
+## Security & Configuration
+
+### Authentication
+```bash
+# Generate secure token (admin)
+python utils/generate_token.py
+
+# Example output:
+# --------------------------------------------------------------------------------
+# Generated at: 2024-03-22T15:30:45.123456
+# Token: XcAwKq7BSbGSoJCsVhUQ2e6MZ4ZOAH_mRR0HgmMNBQg
+# --------------------------------------------------------------------------------
+```
+
+### Traffic Management
+```yaml
+# Rate Limits
+Global: 10 req/s (burst: 25)
+Per-IP: 10 req/s (burst: 25)
+
+# Security Headers
+- XSS Protection
+- Content Type Nosniff
+- Frame Deny
+- HSTS
+```
+
+## API Usage
+
+### Basic Generation
+```bash
+curl -X POST http://localhost:8000/generate \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "inputs": "What is quantum computing?",
+    "parameters": {"max_new_tokens": 50}
+  }'
+```
+
+### Advanced Parameters
+```bash
+curl -X POST http://localhost:8000/generate \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "inputs": "Explain AI",
+    "parameters": {
+      "max_new_tokens": 100,
+      "temperature": 0.7,
+      "top_p": 0.95
+    }
+  }'
+```
+
+### Health Monitoring
+```bash
+# System health
+curl http://localhost:8000/health
+
+# Model status
+curl http://localhost:8000/v1/models
+```
 
 ## Contributing
 
-### Adding a New Model
-
-1. **Verify TGI Compatibility**
-   - Test the model on Intel Developer Cloud
-   - Create an account at [Intel Developer Cloud](https://cloud.intel.com)
-   - Use Intel Data Center Max GPU VM
-   - Verify model works with TGI
-
-2. **Create Model Directory**
-   ```bash
-   mkdir -p NewModel/config
-   ```
-
-3. **Create Configuration Files**
-   - Add `config/model.env`:
-     ```env
-     MODEL_NAME=your-model-tgi
-     MODEL_ID=org/model-name
-     TGI_VERSION=2.4.0-intel-xpu
-     PORT=808x  # Choose unused port
-     SHM_SIZE=2g
-     MAX_CONCURRENT_REQUESTS=1
-     MAX_BATCH_SIZE=1
-     MAX_TOTAL_TOKENS=xxxx
-     MAX_INPUT_LENGTH=xxxx
-     MAX_WAITING_TOKENS=10
-     ```
-
-   - Add `README.md` with:
-     - Model description
-     - License notice
-     - Model information
-     - Configuration
-     - Example usage
-     - Best practices
-
-4. **Test Your Configuration**
-   ```bash
-   ./start.sh your-model
-   ./status.sh your-model
-   # Test with example queries
-   ./stop.sh your-model
-   ```
-
-5. **Submit PR**
-   - Include all test results
-   - Document any special considerations
-   - Explain model's unique capabilities
-
+Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) first.
 
 ## License Notes
 
-Each model has its own license terms. Please review the individual model's README and license before use.
-
-🎉 That's it! You're all set to manage LLMs on Intel GPUs with `xpu_tgi`. Happy deploying!
+Each model has its own license terms. Please review individual model READMEs before use.

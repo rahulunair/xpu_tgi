@@ -12,7 +12,6 @@ fi
 MODEL_DIR="$1"
 MODEL_DIR="models/$MODEL_DIR"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
 ENV_FILE="${SCRIPT_DIR}/${MODEL_DIR}/config/model.env"
 if [[ ! -f "${ENV_FILE}" ]]; then
     log "ERROR: model.env file not found at ${ENV_FILE}"
@@ -62,14 +61,10 @@ if ! docker compose -f "${SCRIPT_DIR}/docker-compose.yml" --env-file "${ENV_FILE
 fi
 
 docker compose -f "${SCRIPT_DIR}/docker-compose.yml" --env-file "${ENV_FILE}" ps
-
 check_network_status
-
 check_port_status "8000"
 check_port_status "${PORT}"
-
 log "Resource usage:"
 docker stats --no-stream $(docker compose -f "${SCRIPT_DIR}/docker-compose.yml" --env-file "${ENV_FILE}" ps -q)
-
 log "Recent logs:"
 docker compose -f "${SCRIPT_DIR}/docker-compose.yml" --env-file "${ENV_FILE}" logs --tail=20
