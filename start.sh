@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-# Strict error handling
 set -euo pipefail
 IFS=$'\n\t'
 
@@ -10,19 +9,16 @@ if [[ $# -ne 1 ]]; then
     exit 1
 fi
 
-# Script variables
 MODEL_DIR="$1"
 MODEL_DIR="models/$MODEL_DIR"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MAX_WAIT=600
 INTERVAL=10
 
-# Logging function
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
 }
 
-# Error handler
 error_handler() {
     local line_no=$1
     local error_code=$2
@@ -31,22 +27,31 @@ error_handler() {
     exit "${error_code}"
 }
 
-# Set error handler
 trap 'error_handler ${LINENO} $?' ERR
 
-# Load and export environment variables
+ROOT_ENV_FILE="${SCRIPT_DIR}/.env"
+if [[ ! -f "${ROOT_ENV_FILE}" ]]; then
+    log "ERROR: .env file not found at ${ROOT_ENV_FILE}"
+    exit 1
+fi
+
+export $(grep VALID_TOKEN "${ROOT_ENV_FILE}")
+
+if [[ -z "${VALID_TOKEN:-}" ]]; then
+    log "ERROR: VALID_TOKEN not found in ${ROOT_ENV_FILE}"
+    exit 1
+fi
+
 ENV_FILE="${SCRIPT_DIR}/${MODEL_DIR}/config/model.env"
 if [[ ! -f "${ENV_FILE}" ]]; then
     log "ERROR: model.env file not found at ${ENV_FILE}"
     exit 1
 fi
 
-# Export all variables from env file
 set -a
 source "${ENV_FILE}"
 set +a
 
-# Validate network before starting
 validate_network() {
     local network_name="${MODEL_NAME}_network"
 
@@ -64,20 +69,20 @@ validate_network() {
     fi
 }
 
-# Debug: Print variables
 log "Using configuration from: ${ENV_FILE}"
 log "MODEL_NAME: ${MODEL_NAME}"
 log "PORT: ${PORT}"
 log "SHM_SIZE: ${SHM_SIZE}"
+log "VALID_TOKEN is set: ${VALID_TOKEN:+yes}"
 
-# Validate network
 validate_network
 
-# Start the service
 log "Starting ${MODEL_NAME} service..."
-docker compose -f "${SCRIPT_DIR}/docker-compose.yml" --env-file "${ENV_FILE}" up -d
+docker compose -f "${SCRIPT_DIR}/docker-compose.yml" \
+    --env-file "${ENV_FILE}" \
+    --env-file "${ROOT_ENV_FILE}" \
+    up -d
 
-# Wait for service to be healthy
 log "Waiting for service to be healthy..."
 elapsed=0
 while [ $elapsed -lt $MAX_WAIT ]; do
@@ -87,7 +92,6 @@ while [ $elapsed -lt $MAX_WAIT ]; do
         exit 0
     fi
 
-    # Show recent logs every 30 seconds
     if (( elapsed % 30 == 0 )); then
         log "Recent container logs:"
         docker compose -f "${SCRIPT_DIR}/docker-compose.yml" --env-file "${ENV_FILE}" logs --tail=20
