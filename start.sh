@@ -23,9 +23,9 @@ error_handler() {
     local line_no=$1
     local error_code=$2
     log "ERROR: Command failed at line ${line_no} with exit code ${error_code}"
-    VALID_TOKEN="${VALID_TOKEN}" docker compose -f "${SCRIPT_DIR}/docker-compose.yml" \
+    docker compose -f "${SCRIPT_DIR}/docker-compose.yml" \
         --env-file "${ENV_FILE}" \
-        -e VALID_TOKEN="${VALID_TOKEN}" \
+        --env-file "${ROOT_ENV_FILE}" \
         logs
     exit "${error_code}"
 }
@@ -67,9 +67,9 @@ validate_network() {
         if [[ -n "${connected_containers}" ]]; then
             log "WARNING: Network ${network_name} is being used by: ${connected_containers}"
             log "Cleaning up existing network..."
-            VALID_TOKEN="${VALID_TOKEN}" docker compose -f "${SCRIPT_DIR}/docker-compose.yml" \
+            docker compose -f "${SCRIPT_DIR}/docker-compose.yml" \
                 --env-file "${ENV_FILE}" \
-                -e VALID_TOKEN="${VALID_TOKEN}" \
+                --env-file "${ROOT_ENV_FILE}" \
                 down --remove-orphans
         fi
     fi
@@ -84,9 +84,10 @@ log "VALID_TOKEN is set: ${VALID_TOKEN:+yes}"
 validate_network
 
 log "Starting ${MODEL_NAME} service..."
-VALID_TOKEN="${VALID_TOKEN}" docker compose -f "${SCRIPT_DIR}/docker-compose.yml" \
+export VALID_TOKEN
+docker compose -f "${SCRIPT_DIR}/docker-compose.yml" \
     --env-file "${ENV_FILE}" \
-    -e VALID_TOKEN="${VALID_TOKEN}" \
+    --env-file "${ROOT_ENV_FILE}" \
     up -d
 
 log "Waiting for service to be healthy..."
