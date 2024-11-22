@@ -4,7 +4,7 @@ services:
       context: ./services/auth
     container_name: tgi_auth
     environment:
-      VALID_TOKEN: "${VALID_TOKEN}"
+      - VALID_TOKEN=${VALID_TOKEN}
     env_file:
       - .env
     networks:
@@ -45,7 +45,7 @@ services:
     env_file:
       - .env
     environment:
-      VALID_TOKEN: "${VALID_TOKEN}"
+      - VALID_TOKEN=${VALID_TOKEN}
 
   tgi:
     image: ghcr.io/huggingface/text-generation-inference:${TGI_VERSION}
@@ -63,10 +63,10 @@ services:
     networks:
       - tgi_net
     environment:
-      VALID_TOKEN: "${VALID_TOKEN}"
-      MODEL_NAME: "${MODEL_NAME}"
-      MODEL_ID: "${MODEL_ID}"
-      MAX_CONCURRENT_REQUESTS=${MAX_CONCURRENT_REQUESTS}
+      - VALID_TOKEN=${VALID_TOKEN}
+      - MODEL_NAME=${MODEL_NAME}
+      - MODEL_ID=${MODEL_ID}
+      - MAX_CONCURRENT_REQUESTS=${MAX_CONCURRENT_REQUESTS}
       - MAX_BATCH_SIZE=${MAX_BATCH_SIZE}
       - MAX_TOTAL_TOKENS=${MAX_TOTAL_TOKENS}
       - MAX_INPUT_LENGTH=${MAX_INPUT_LENGTH}
