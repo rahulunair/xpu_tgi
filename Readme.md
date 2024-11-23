@@ -27,37 +27,37 @@ curl -X POST http://localhost:8000/generate \
 ## Architecture & Security
 
 ```mermaid
-graph LR
-    %% Nodes
+flowchart LR
     Client([Client])
-    Traefik[Traefik Proxy\n:8000]
-    Auth[Auth Service\n:3000]
-    TGI[TGI Service\n:80]
-    
-    %% Connections
-    Client -->|HTTP Request + Token| Traefik
-    
+    Traefik[Traefik Proxy]
+    Auth[Auth Service]
+    TGI[TGI Service]
+
+    Client --> Traefik
+    Traefik --> Auth
+    Auth --> Traefik
+    Traefik --> TGI
+    TGI --> Traefik
+    Traefik --> Client
+
     subgraph Internal["Internal Network"]
-        Traefik -->|1. Validate| Auth
-        Auth -->|2. Token Status| Traefik
-        Traefik -->|3. If Valid| TGI
-        TGI -->|4. Response| Traefik
+        Traefik
+        Auth
+        TGI
     end
-    
-    Traefik -->|5. Response| Client
-    
-    %% Styling
-    classDef client fill:#f2d2ff,stroke:#9645b7,stroke-width:2px
-    classDef proxy fill:#bbdefb,stroke:#1976d2,stroke-width:2px
-    classDef auth fill:#c8e6c9,stroke:#388e3c,stroke-width:2px
-    classDef tgi fill:#ffccbc,stroke:#e64a19,stroke-width:2px
-    classDef network fill:#fff9c4,stroke:#fbc02d,stroke-width:1px
-    
-    class Client client
-    class Traefik proxy
-    class Auth auth
-    class TGI tgi
-    class Internal network
+
+    classDef client fill:#f2d2ff,stroke:#9645b7,stroke-width:2px;
+    classDef proxy fill:#bbdefb,stroke:#1976d2,stroke-width:2px;
+    classDef auth fill:#c8e6c9,stroke:#388e3c,stroke-width:2px;
+    classDef tgi fill:#ffccbc,stroke:#e64a19,stroke-width:2px;
+    classDef network fill:#fff9c4,stroke:#fbc02d,stroke-width:1px;
+
+    class Client client;
+    class Traefik proxy;
+    class Auth auth;
+    class TGI tgi;
+    class Internal network;
+
 ```
 
 ### Key Features
